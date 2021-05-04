@@ -1,7 +1,7 @@
+from ckeditor.widgets import CKEditorWidget
 from django import forms
 from django.forms import ModelForm, Textarea
-from .models import Venue
-from ckeditor.widgets import CKEditorWidget
+
 from .models import Venue, Event
 
 
@@ -14,6 +14,7 @@ class MyFormWidget(forms.TextInput):
 
 class VenueForm(ModelForm):
     required_css_class = 'required'
+
     class Meta:
         model = Venue
         fields = '__all__'
@@ -35,11 +36,12 @@ class VenueForm(ModelForm):
         if not (phone or email_address):
             raise forms.ValidationError(
                 "You must enter either a phone number or an email, or both."
-                )
+            )
 
 
 class EventForm(ModelForm):
     description = forms.CharField(widget=CKEditorWidget())
+
     class Meta:
         model = Event
         fields = ['name', 'event_date', 'description']
@@ -51,3 +53,11 @@ class CommitteeForm(forms.Form):
     phone = forms.CharField()
 
 
+class SurveyForm1(forms.Form):
+    name = forms.CharField(max_length=100)
+    email = forms.EmailField()
+
+
+class SurveyForm2(forms.Form):
+    response1 = forms.CharField(label="What's great about our club?", widget=Textarea)
+    response2 = forms.CharField(label="What's not so great about our club?", widget=Textarea)

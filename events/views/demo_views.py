@@ -33,6 +33,10 @@ from django.forms import formset_factory
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.forms import formset_factory, modelformset_factory
 
+from formtools.wizard.views import SessionWizardView
+from django.core.mail import send_mail, get_connection
+from django.contrib import messages
+
 
 class ArchiveIndexViewDemo(ArchiveIndexView):
     model = Event
@@ -229,3 +233,33 @@ def all_events(request):
     return render(request, 'events/all_events.html', context)
 
 
+class SurveyWizard(SessionWizardView):
+    template_name = 'events/survey.html'
+    def done(self, form_list, **kwargs):
+        responses = [form.cleaned_data for form in form_list]
+        mail_body = ''
+        for response in responses:
+            for k,v in response.items():
+                mail_body += "%s: %s\n" % (k, v)
+        con = get_connection('django.core.mail.backends.console.EmailBackend')
+        send_mail(
+            'Survey Submission',
+            mail_body,
+            'noreply@example.com',
+            ['siteowner@example.com'],
+            connection=con
+        )
+        messages.add_message(
+            self.request,
+            messages.SUCCESS,
+            'Your survey was submitted successfully. Thank you for your feedback'
+        )
+        return HttpResponseRedirect('/survey')
+
+
+class ModelFormWizard(SessionWizardView):
+    template_name = 'events/modelwiz_demo.html'
+    def done(self, form_list, **kwargs):
+        for form in form_list:
+            form.save()
+        return HttpResponseRedirect('/')

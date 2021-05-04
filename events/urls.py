@@ -5,8 +5,13 @@ from .views import CreateViewDemo, UpdateViewDemo, DeleteViewDemo
 from django.views.generic.dates import ArchiveIndexView
 from .models import Event
 from .views import ArchiveIndexViewDemo, MonthArchiveViewDemo
+from events.views import SurveyWizard, ModelFormWizard
+from events.forms import SurveyForm1, SurveyForm2
+from events.forms import VenueForm, EventForm
 
 urlpatterns = [
+    path('new/', ModelFormWizard.as_view([VenueForm, EventForm]), name='wizard-demo'),
+    path('survey/', SurveyWizard.as_view([SurveyForm1, SurveyForm2]), name='survey'),
     path('', views.index, name='index'),
     path('eventarchive/', ArchiveIndexViewDemo.as_view(), name='event-index'),
     path('<int:year>/<int:month>', MonthArchiveViewDemo.as_view(), name='event-montharchive'),
