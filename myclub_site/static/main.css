@@ -84,7 +84,7 @@ ul.errorlist {
     padding: 0;
 }
 
-.errorlist li {
+.errorlist li, .error {
     border: 1px solid red;
     color: red;
     background: rgba(255, 0, 0, 0.15);
@@ -121,3 +121,4 @@ input {
 .required label:after {
     content: "*";
 }
+

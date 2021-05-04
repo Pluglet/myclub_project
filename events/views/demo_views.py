@@ -5,10 +5,11 @@ import io
 # from datetime import date
 # import calendar
 from datetime import datetime
+from events.forms import EventForm
 
 from django.views.generic.dates import ArchiveIndexView, MonthArchiveView
 from django.core import serializers
-# from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.http import FileResponse
 from django.http import HttpResponse
 from django.shortcuts import render
@@ -26,6 +27,11 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 
 # from calendar import HTMLCalendar
 from events.models import Venue, MyClubUser, Event
+from events.forms import EventForm, CommitteeForm
+from django.forms import formset_factory
+
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.forms import formset_factory, modelformset_factory
 
 
 class ArchiveIndexViewDemo(ArchiveIndexView):
@@ -55,17 +61,19 @@ class CreateViewDemo(LoginRequiredMixin, CreateView):
 
     login_url = reverse_lazy('login')
     model = Event
-    fields = ['name', 'event_date', 'description']
+    # fields = ['name', 'event_date', 'description']
     success_url = reverse_lazy('show-events')
+    form_class = EventForm
 
 
 class UpdateViewDemo(LoginRequiredMixin, UpdateView):
 
     login_url = reverse_lazy('login')
     model = Event
-    fields = ['name', 'event_date', 'description']
+    # fields = ['name', 'event_date', 'description']
     template_name_suffix = '_update_form'
     success_url = reverse_lazy('show-events')
+    form_class = EventForm
 
 
 class DeleteViewDemo(LoginRequiredMixin, DeleteView):
@@ -177,3 +185,47 @@ class TemplateViewDemo(TemplateView):
         context = super().get_context_data(**kwargs)
         context['title'] = "Testing the TemplateView CBV"
         return context
+
+
+def committee_formset(request):
+    committee_formset = formset_factory(CommitteeForm, extra=3)
+    if request.method == 'POST':
+        formset = committee_formset(request.POST)
+        if formset.is_valid():
+            # process the form
+            pass
+    else:
+        formset = committee_formset()
+        return render(request, 'events/committee.html', {'formset': formset})
+
+def all_events(request):
+    EventsFormSet = modelformset_factory(
+        Event,
+        fields=('name', 'event_date'),
+        extra=0
+    )
+    qry = Event.events.all()
+    pg = Paginator(qry, 4)
+    page = request.GET.get('page')
+    try:
+        event_records = pg.page(page)
+    except PageNotAnInteger:
+        event_records = pg.page(1)
+    except EmptyPage:
+        event_records = pg.page(pg.num_pages)
+    if request.method =='POST':
+        formset = EventsFormSet(request.POST)
+        if formset.is_valid():
+            formset.save()
+            return_url = '/allevents/'
+            if 'page' in request.GET:
+                return_url += '?page' + request.GET['page']
+            return HttpResponseRedirect (return_url)
+    else:
+        page_qry = qry.filter(id__in=[event.id for event in event_records])
+        formset = EventsFormSet(queryset=page_qry)
+
+    context = {'event_records':event_records, 'formset': formset}
+    return render(request, 'events/all_events.html', context)
+
+

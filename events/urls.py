@@ -6,10 +6,9 @@ from django.views.generic.dates import ArchiveIndexView
 from .models import Event
 from .views import ArchiveIndexViewDemo, MonthArchiveViewDemo
 
-
 urlpatterns = [
     path('', views.index, name='index'),
-    path('eventarchive/', ArchiveIndexViewDemo.as_view(),name='event-index'),
+    path('eventarchive/', ArchiveIndexViewDemo.as_view(), name='event-index'),
     path('<int:year>/<int:month>', MonthArchiveViewDemo.as_view(), name='event-montharchive'),
     path('condemo/', views.context_demo, name='condemo'),
     path('tdemo/', views.template_demo, name='tdemo'),
@@ -27,4 +26,6 @@ urlpatterns = [
 
     # path('<int:year>/<str:month>/', views.index, name='index'),
     re_path(r'^(?P<year>[0-9]{4})/(?P<month>0?[1-9]|1[0-2])/', views.index, name='index'),
+    path('committee/', views.committee_formset, name='committee'),
+    path('allevents/', views.all_events, name='all-events'),
 ]
