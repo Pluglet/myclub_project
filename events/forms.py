@@ -1,6 +1,13 @@
 from django import forms
-from django.forms import ModelForm
+from django.forms import ModelForm, Textarea
 from .models import Venue
+
+
+class MyFormWidget(forms.TextInput):
+    class Media:
+        css = {
+            'all': ('widget.css',)
+        }
 
 
 class VenueForm(ModelForm):
@@ -8,6 +15,16 @@ class VenueForm(ModelForm):
     class Meta:
         model = Venue
         fields = '__all__'
+        widgets = {
+            'name': MyFormWidget(attrs={'class': 'mywidget'}),
+            'address': Textarea(attrs={'cols': 40, 'rows': 3})
+        }
+
+    class Media:
+        css = {
+            'all': ('form.css',)
+        }
+        js = ('mycustom.js',)
 
     def clean(self):
         cleaned_data = super().clean()

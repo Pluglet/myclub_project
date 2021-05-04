@@ -22,6 +22,7 @@ from django.urls import reverse_lazy
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.units import inch
 from reportlab.pdfgen import canvas
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 # from calendar import HTMLCalendar
 from events.models import Venue, MyClubUser, Event
@@ -50,22 +51,26 @@ class DetailViewDemo(DetailView):
     context_object_name = 'event'
 
 
-class CreateViewDemo(CreateView):
+class CreateViewDemo(LoginRequiredMixin, CreateView):
 
+    login_url = reverse_lazy('login')
     model = Event
     fields = ['name', 'event_date', 'description']
     success_url = reverse_lazy('show-events')
 
 
-class UpdateViewDemo(UpdateView):
+class UpdateViewDemo(LoginRequiredMixin, UpdateView):
+
+    login_url = reverse_lazy('login')
     model = Event
     fields = ['name', 'event_date', 'description']
     template_name_suffix = '_update_form'
     success_url = reverse_lazy('show-events')
 
 
-class DeleteViewDemo(DeleteView):
+class DeleteViewDemo(LoginRequiredMixin, DeleteView):
 
+    login_url = reverse_lazy('login')
     model = Event
     context_object_name = 'event'
     success_url = reverse_lazy('show-events')

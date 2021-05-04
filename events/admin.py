@@ -3,7 +3,7 @@ from django.contrib.admin import AdminSite
 from django.contrib.auth.models import User, Group
 from django.contrib.auth.admin import UserAdmin
 from django.http import HttpResponse
-from .models import Venue, MyClubUser, Event
+from .models import Venue, MyClubUser, Event, Subscriber
 from events.forms import VenueForm
 import csv
 from django import forms
@@ -106,18 +106,18 @@ class MyClubUserInline(admin.StackedInline):
     verbose_name_plural = "Additional Info"
 
 
-# class MyClubUserAdmin(UserAdmin):
-#     inlines = (MyClubUserInline,)
+class MyClubUserAdmin(UserAdmin):
+    inlines = (MyClubUserInline,)
 
 
-# @admin.register(Subscriber)
-# class SubscriberAdmin(admin.ModelAdmin):
-#     list_display = ('user', 'member_level')
-#     list_filter = ('member_level',)
+@admin.register(Subscriber)
+class SubscriberAdmin(admin.ModelAdmin):
+    list_display = ('user', 'member_level')
+    list_filter = ('member_level',)
 
 
-# admin.site.unregister(User)
-# admin.site.register(User, MyClubUserAdmin)
+admin.site.unregister(User)
+admin.site.register(User, MyClubUserAdmin)
 # admin.site.register(Venue)
 # admin.site.register(MyClubUser)
 # admin.site.register(Event)

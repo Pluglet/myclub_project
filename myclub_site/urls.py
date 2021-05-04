@@ -20,7 +20,7 @@ from . import contact
 # from events.admin import admin_site
 from django.views.generic.base import TemplateView
 from django.views.generic.base import RedirectView
-from events.views import TemplateViewDemo
+from events.views import TemplateViewDemo, Register
 
 
 admin.site.site_header = 'MyClub Administration'
@@ -60,8 +60,8 @@ urlpatterns = [
     path(
         'register/success/',
         TemplateView.as_view(template_name="registration/success.html"),
-        name ='register-success',
+        name='register-success',
     ),
-    # path('register/', Register.as_view(), name='register'),
+    path('register/', Register.as_view(), name='register'),
     path('', include('django.contrib.auth.urls')),
 ]
